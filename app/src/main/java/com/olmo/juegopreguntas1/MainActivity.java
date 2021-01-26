@@ -1,10 +1,15 @@
 package com.olmo.juegopreguntas1;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,9 +20,12 @@ public class MainActivity extends AppCompatActivity {
     private int preguntaEnCurso = 0;
 
     TextView pregunta;
+    RadioGroup rg;
     RadioButton res1, res2, res3;
     Button siguiente;
     int resBuenas = 0;
+    ImageView imgPregunta;
+    String img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
         res2 = findViewById(R.id.rb2);
         res3 = findViewById(R.id.rb3);
         siguiente = findViewById(R.id.btnSiguiente);
+        imgPregunta = findViewById(R.id.imageViewPregunta);
+        rg= findViewById(R.id.rg);
+
 
         cargarPreguntas();
 
@@ -36,16 +47,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void cargarPreguntas() {
-        preguntas[0] = new Pregunta("Enunciado Pregunta 1", "Respuesta 1", "Respuesta 2", "Respuesta 3", 1);
-        preguntas[1] = new Pregunta("Enunciado Pregunta 2", "Respuesta 1", "Respuesta 2", "Respuesta 3", 1);
-        preguntas[2] = new Pregunta("Enunciado Pregunta 3", "Respuesta 1", "Respuesta 2", "Respuesta 3", 1);
-        preguntas[3] = new Pregunta("Enunciado Pregunta 4", "Respuesta 1", "Respuesta 2", "Respuesta 3", 1);
-        preguntas[4] = new Pregunta("Enunciado Pregunta 5", "Respuesta 1", "Respuesta 2", "Respuesta 3", 1);
-        preguntas[5] = new Pregunta("Enunciado Pregunta 6", "Respuesta 1", "Respuesta 2", "Respuesta 3", 1);
-        preguntas[6] = new Pregunta("Enunciado Pregunta 7", "Respuesta 1", "Respuesta 2", "Respuesta 3", 1);
-        preguntas[7] = new Pregunta("Enunciado Pregunta 8", "Respuesta 1", "Respuesta 2", "Respuesta 3", 1);
-        preguntas[8] = new Pregunta("Enunciado Pregunta 9", "Respuesta 1", "Respuesta 2", "Respuesta 3", 1);
-        preguntas[9] = new Pregunta("Enunciado Pregunta 10", "Respuesta 1", "Respuesta 2", "Respuesta 3", 1);
+        preguntas[0] = new Pregunta("¿Qué pieza es esta?", "Rey", "Caballo", "Peón", 1, "white_king");
+        preguntas[1] = new Pregunta("¿Qué pieza es esta?", "Alfil", "Dama", "Torre", 2,"black_queen");
+        preguntas[2] = new Pregunta("¿Cómo se mueve?", "En todas las direcciones 1 casilla", "Solo en linea recta", "Saltando en forma de L", 1, "black_king");
+        preguntas[3] = new Pregunta("¿En que columnas se coloca al inicio?", "F&G", "No empieza en el tablero", "A&H", 3, "white_rook");
+        preguntas[4] = new Pregunta("¿Qué pieza es esta?", "Caballo", "Consejero", "Peón", 3, "black_pawn");
+        preguntas[5] = new Pregunta("¿Qué pieza es esta?", "Antonio Resines", "Alfil", "Valvula de inyección", 2,"black_bishop");
+        preguntas[6] = new Pregunta("¿Cuantos de ellos hay?", "2", "8", "16", 3, "white_pawn");
+        preguntas[7] = new Pregunta("¿Qué pieza es esta?", "Eje transversal", "Doble Dama", "Caballo", 3, "black_knight");
+        preguntas[8] = new Pregunta("¿Se puede dar Jque mate con esta pieza solo?", "No", "Si, pero hace falta la ayuda de las piezas contrarias", "Si", 2, "white_knight");
+        preguntas[9] = new Pregunta("¿Qué pieza es esta?", "Torre", "Alfil", "Caballo", 1, "black_rook");
     }
 
     public void validarRespuesta() {
@@ -57,19 +68,19 @@ public class MainActivity extends AppCompatActivity {
             resSelect = 1;
         } else if (res2.isChecked()) {
             resSelect = 2;
-        } else if (res2.isChecked()) {
+        } else if (res3.isChecked()) {
             resSelect = 3;
         } else {
             // El usuario no seleccionó ninguna respuesta
             resSelect = 0;
         }
+        System.out.println(resSelect);
 
         // Registra las respuestas correctas
         if (preguntas[preguntaEnCurso].getCorrecta() == resSelect) {
             resBuenas++;
             Toast.makeText(this,"Respuesta Correcta",Toast.LENGTH_SHORT).show();
         }
-
         // Pasa a la siguiente pregunta
         preguntaEnCurso++;
         if (preguntaEnCurso < NPREGUNTAS) {
@@ -91,6 +102,20 @@ public class MainActivity extends AppCompatActivity {
         res1.setText(preguntaActual.getRespuesta()[0]);
         res2.setText(preguntaActual.getRespuesta()[1]);
         res3.setText(preguntaActual.getRespuesta()[2]);
+
+        /*Para cambiar la img*/
+        Resources res = getResources();
+        String name = preguntaActual.getImg();
+        int resID = res.getIdentifier(name , "drawable", getPackageName());
+        Drawable drawable = res.getDrawable(resID );
+
+
+        imgPregunta.setImageDrawable(drawable);
+
+        rg.clearCheck();
+
+
+
   
     }
 
