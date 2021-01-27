@@ -5,13 +5,18 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import es.dmoral.toasty.Toasty;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,15 +28,19 @@ public class MainActivity extends AppCompatActivity {
     RadioGroup rg;
     RadioButton res1, res2, res3;
     Button siguiente;
-    int resBuenas = 0;
+    int resBuenas, resFallos,resVacias = 0;
     ImageView imgPregunta;
     String img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_main);
 
+
+        Toasty.Config.getInstance().tintIcon(false).setTextSize(25).allowQueue(false).apply();
         pregunta = findViewById(R.id.tvPregunta);
         res1 = findViewById(R.id.rb1);
         res2 = findViewById(R.id.rb2);
@@ -39,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         siguiente = findViewById(R.id.btnSiguiente);
         imgPregunta = findViewById(R.id.imageViewPregunta);
         rg= findViewById(R.id.rg);
-
 
         cargarPreguntas();
 
@@ -74,12 +82,25 @@ public class MainActivity extends AppCompatActivity {
             // El usuario no seleccionó ninguna respuesta
             resSelect = 0;
         }
-        System.out.println(resSelect);
+
 
         // Registra las respuestas correctas
         if (preguntas[preguntaEnCurso].getCorrecta() == resSelect) {
             resBuenas++;
-            Toast.makeText(this,"Respuesta Correcta",Toast.LENGTH_SHORT).show();
+            Toast correcto = Toasty.success(this, "¡Correcta!", Toast.LENGTH_SHORT, true);
+            correcto.setGravity(Gravity.CENTER, 0, 750);
+            correcto.show();
+
+            //Registra las no contestadas
+        }else if (resSelect==0){
+            resVacias++;
+            
+            //Registra las Incorrectas
+        }else{
+            resFallos++;
+            Toast fallo = Toasty.error(this, "Fallo", Toast.LENGTH_SHORT, true);
+            fallo.setGravity(Gravity.CENTER,0,750);
+            fallo.show();
         }
         // Pasa a la siguiente pregunta
         preguntaEnCurso++;
@@ -108,10 +129,7 @@ public class MainActivity extends AppCompatActivity {
         String name = preguntaActual.getImg();
         int resID = res.getIdentifier(name , "drawable", getPackageName());
         Drawable drawable = res.getDrawable(resID );
-
-
         imgPregunta.setImageDrawable(drawable);
-
         rg.clearCheck();
 
 
@@ -130,11 +148,22 @@ public class MainActivity extends AppCompatActivity {
     public void mostrarResultado() {
 
         // Muestra el número de respuestas correctas al finalizar el test
+        Toasty.Config.getInstance().setTextSize(12).allowQueue(false).apply();
+        Toast resultadoBuenas;
+        String mensaje = "Correctas: "+resBuenas+"/"+NPREGUNTAS + " " + "En Blanco: "+resVacias+"/"+NPREGUNTAS+ " " +"Fallos: "+resFallos+"/"+NPREGUNTAS ;
+        resultadoBuenas = Toasty.info(this, mensaje, Toast.LENGTH_LONG, true);
+        resultadoBuenas.setGravity(Gravity.CENTER, 0,750);
+        resultadoBuenas.show();
 
-        Toast resultado;
-        String mensaje = "Respuestas correctas: "+resBuenas+"/"+NPREGUNTAS;
-        resultado = Toast.makeText(this, mensaje, Toast.LENGTH_LONG);
-        resultado.show();
+
+
+
+
+
+
+
+
+
     }
 
 
