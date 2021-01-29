@@ -1,14 +1,11 @@
 package com.olmo.juegopreguntas1;
-import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -16,9 +13,11 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import es.dmoral.toasty.Toasty;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     static final int NPREGUNTAS = 10;
     private Pregunta[] preguntas = new Pregunta[NPREGUNTAS];
@@ -27,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
     TextView pregunta;
     RadioGroup rg;
     RadioButton res1, res2, res3;
-    Button siguiente;
-    int resBuenas, resFallos,resVacias = 0;
+    Button siguiente, reiniciar;
+    int resBuenas, resFallos, resVacias = 0;
     ImageView imgPregunta;
     String img;
 
@@ -46,8 +45,12 @@ public class MainActivity extends AppCompatActivity {
         res2 = findViewById(R.id.rb2);
         res3 = findViewById(R.id.rb3);
         siguiente = findViewById(R.id.btnSiguiente);
+        siguiente.setOnClickListener(this);
+        reiniciar = findViewById(R.id.btnReiniciar);
+        reiniciar.setOnClickListener(this);
+        reiniciar.setVisibility(View.INVISIBLE);
         imgPregunta = findViewById(R.id.imageViewPregunta);
-        rg= findViewById(R.id.rg);
+        rg = findViewById(R.id.rg);
 
         cargarPreguntas();
 
@@ -56,11 +59,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void cargarPreguntas() {
         preguntas[0] = new Pregunta("¿Qué pieza es esta?", "Rey", "Caballo", "Peón", 1, "white_king");
-        preguntas[1] = new Pregunta("¿Qué pieza es esta?", "Alfil", "Dama", "Torre", 2,"black_queen");
+        preguntas[1] = new Pregunta("¿Qué pieza es esta?", "Alfil", "Dama", "Torre", 2, "black_queen");
         preguntas[2] = new Pregunta("¿Cómo se mueve?", "En todas las direcciones 1 casilla", "Solo en linea recta", "Saltando en forma de L", 1, "black_king");
         preguntas[3] = new Pregunta("¿En que columnas se coloca al inicio?", "F&G", "No empieza en el tablero", "A&H", 3, "white_rook");
         preguntas[4] = new Pregunta("¿Qué pieza es esta?", "Caballo", "Consejero", "Peón", 3, "black_pawn");
-        preguntas[5] = new Pregunta("¿Qué pieza es esta?", "Antonio Resines", "Alfil", "Valvula de inyección", 2,"black_bishop");
+        preguntas[5] = new Pregunta("¿Qué pieza es esta?", "Antonio Resines", "Alfil", "Valvula de inyección", 2, "black_bishop");
         preguntas[6] = new Pregunta("¿Cuantos de ellos hay?", "2", "8", "16", 3, "white_pawn");
         preguntas[7] = new Pregunta("¿Qué pieza es esta?", "Eje transversal", "Doble Dama", "Caballo", 3, "black_knight");
         preguntas[8] = new Pregunta("¿Se puede dar Jque mate con esta pieza solo?", "No", "Si, pero hace falta la ayuda de las piezas contrarias", "Si", 2, "white_knight");
@@ -92,14 +95,14 @@ public class MainActivity extends AppCompatActivity {
             correcto.show();
 
             //Registra las no contestadas
-        }else if (resSelect==0){
+        } else if (resSelect == 0) {
             resVacias++;
-            
+
             //Registra las Incorrectas
-        }else{
+        } else {
             resFallos++;
             Toast fallo = Toasty.error(this, "Fallo", Toast.LENGTH_SHORT, true);
-            fallo.setGravity(Gravity.CENTER,0,750);
+            fallo.setGravity(Gravity.CENTER, 0, 750);
             fallo.show();
         }
         // Pasa a la siguiente pregunta
@@ -109,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Si se llega al final del test, se desactiva el botón siguiente
             siguiente.setEnabled(false);
+            reiniciar.setVisibility(View.VISIBLE);
             mostrarResultado();
         }
     }
@@ -127,41 +131,41 @@ public class MainActivity extends AppCompatActivity {
         /*Para cambiar la img*/
         Resources res = getResources();
         String name = preguntaActual.getImg();
-        int resID = res.getIdentifier(name , "drawable", getPackageName());
-        Drawable drawable = res.getDrawable(resID );
+        int resID = res.getIdentifier(name, "drawable", getPackageName());
+        Drawable drawable = res.getDrawable(resID);
         imgPregunta.setImageDrawable(drawable);
         rg.clearCheck();
 
 
-
-  
     }
 
-    public void Siguiente(View v) {
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btnSiguiente:
+                // Cuando se pasa a la siguienye pregunta, se valida la respuesta de la pregunta actual
 
-        // Cuando se pasa a la siguienye pregunta, se valida la respuesta de la pregunta actual
+                validarRespuesta();
+                break;
+            case R.id.btnReiniciar:
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                startActivity(intent);
+                break;
 
-        validarRespuesta();
-
+        }
     }
+
+
 
     public void mostrarResultado() {
 
         // Muestra el número de respuestas correctas al finalizar el test
         Toasty.Config.getInstance().setTextSize(12).allowQueue(false).apply();
         Toast resultadoBuenas;
-        String mensaje = "Correctas: "+resBuenas+"/"+NPREGUNTAS + " " + "En Blanco: "+resVacias+"/"+NPREGUNTAS+ " " +"Fallos: "+resFallos+"/"+NPREGUNTAS ;
+        String mensaje = "Correctas: " + resBuenas + "/" + NPREGUNTAS + " " + "En Blanco: " + resVacias + "/" + NPREGUNTAS + " " + "Fallos: " + resFallos + "/" + NPREGUNTAS;
         resultadoBuenas = Toasty.info(this, mensaje, Toast.LENGTH_LONG, true);
-        resultadoBuenas.setGravity(Gravity.CENTER, 0,750);
+        resultadoBuenas.setGravity(Gravity.CENTER, 0, 750);
         resultadoBuenas.show();
-
-
-
-
-
-
-
-
 
 
     }
